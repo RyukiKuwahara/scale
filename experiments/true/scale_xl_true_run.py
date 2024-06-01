@@ -36,5 +36,5 @@ for k in tqdm(data.keys()):
     label = data[k]["label"].tolist()
     res = scorer.score(convo, inf_summ)
     results[k] = [res, label]
-    with open(f"results/scale_{size}_true_results.json", "a") as file:
+    with open(f"results/scale_{size}_true_results.json", "w") as file:
         json.dump(results, file)
