@@ -19,6 +19,8 @@ def get_chunks(
     if chunk_size is None:
         chunk_size = tokenizer.model_max_length
 
+
+    print(joined_convo, type(joined_convo))
     fulltext = prompt.replace("{{premise}}", joined_convo)
     full_tokens = tokenizer(fulltext, return_tensors="pt").input_ids
     if len(full_tokens[0]) < chunk_size:
