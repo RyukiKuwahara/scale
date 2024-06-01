@@ -32,8 +32,8 @@ results = {}
 for k in tqdm(data.keys()):
     inf_summ = data[k]["generated_text"].to_numpy()[..., np.newaxis].tolist()
     convo = data[k]["grounding"].to_numpy()[..., np.newaxis].tolist()
+    convo = [premiss[0] for premiss in convo]
     label = data[k]["label"].tolist()
-    res = scorer.score(convo, inf_summ)
     results[k] = [res, label]
-    with open(f"results/scale_{size}_true_results.json", "w") as file:
+    with open(f"results/scale_{size}_true_results.json", "a") as file:
         json.dump(results, file)
