@@ -32,8 +32,8 @@ results = {}
 for k in tqdm(data.keys()):
     # inf_summ = data[k]["generated_text"].to_numpy()[..., np.newaxis].tolist()[0]
     # convo = data[k]["grounding"].to_numpy()[..., np.newaxis].tolist()[0]
-    inf_summ = ["he served as the president from 1946."] #target
-    convo = ["Donald John Trump (born June 14, 1946) is an American politician, media personality, and businessman who served as the 45th president of the United States from 2017 to 2021."] #source
+    inf_summ = ["it is a long pole, or spear"] #target
+    convo = ["early skiers used one long pole or spear."] #source
     print("inf_summ: ", inf_summ)
     print("convo: ", convo)
     label = data[k]["label"].tolist()[0]
