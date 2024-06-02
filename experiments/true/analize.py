@@ -1,6 +1,6 @@
 from scale_score.eval import evaluate_scale
 from sklearn.metrics import roc_auc_score
-from scipy.stats import pearsonr
+from tqdm import tqdm
 import json
 
 
@@ -10,16 +10,19 @@ with open("./experiments/true/results/scale_xl_true_results.json", "r") as f:
 
 
 print(data.keys())
-res, label = data["begin"][0], data["begin"][1]
-print(len(res), len(label))
 
-metrics = evaluate_scale(res, label)
-print(metrics)
+scores = {}
+for k in tqdm(data.keys()):
 
-roc_auc = roc_auc_score(label, res)
-print("ROC-AUC:", roc_auc)
+    res, label = data[k][0], data[k][1]
 
-p_stat = pearsonr(res, label)[0]
-print("p_stat", p_stat)
+    metrics = evaluate_scale(res, label)
+
+    roc_auc = roc_auc_score(label, res)
+
+    scores[k] = { "roc_auc": roc_auc, "metrics": metrics}
+
+with open("./experiments/true/scores/scale_xl_true_scores.json", "w") as f:
+    json.dump(scores, f)
 
 
