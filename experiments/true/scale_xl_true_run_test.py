@@ -32,12 +32,13 @@ results = {}
 for k in tqdm(data.keys()):
     # inf_summ = data[k]["generated_text"].to_numpy()[..., np.newaxis].tolist()[0]
     # convo = data[k]["grounding"].to_numpy()[..., np.newaxis].tolist()[0]
-    inf_summ = ["it is a long pole, or spear"] #target
-    convo = ["early skiers used one long pole or spear."] #source
-    print("inf_summ: ", inf_summ)
-    print("convo: ", convo)
+    inf_summ = ["A and C is true"] #target
+    convo = ["A is true. B is true. C is true. D is true. E is true. F is true. G is true. H is true."] #source
+    convo = [convo[0].split(". ")]
+    # print("inf_summ: ", inf_summ)
+    # print("convo: ", convo)
     label = data[k]["label"].tolist()[0]
-    res = scorer.score(convo, [inf_summ])
+    res = scorer.retrieve(convo, [inf_summ])
     results[k] = [res, label]
     print(results)
     break

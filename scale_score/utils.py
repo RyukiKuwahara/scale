@@ -63,6 +63,8 @@ def get_retrieval_chunks(
     tokenizer: T5Tokenizer, convo: List[str], prompt: str, branches: int = 2
 ) -> Tuple[List[Any], List[List[str]]]:
     num_sents = len(convo)
+    # print("num_sents", num_sents)
+    # print(convo)
     if num_sents == 1:
         return [
             tokenizer(
@@ -78,6 +80,7 @@ def get_retrieval_chunks(
     ranges = []
     for i in range(0, num_sents, interval):
         ranges.append(convo[(i) : (interval + i)])
+        # print("ranges", ranges)
         pmp = " ".join(convo[(i) : (interval + i)])
         cs.append(
             tokenizer(prompt.replace("{{premise}}", pmp), return_tensors="pt").input_ids
@@ -363,8 +366,11 @@ def scale_retrieve(
             if texts is None:
                 raise ValueError("texts cannot be None")
             max_chunk = np.argmax(chunk_results)
+            print(utts, chunk_results)
             utts = texts[max_chunk]
             # Optionally continue descending
+            pre_chunk_results = chunk_results
+            pre_max_chunk = max_chunk
             while len(utts) > 1:
                 chunk_results, texts = run_model_chunks(
                     model=model,
@@ -377,9 +383,17 @@ def scale_retrieve(
                 )
                 if texts is None:
                     raise ValueError("texts cannot be None")
+                
+                print(utts, chunk_results)
+                if max(chunk_results) < max(pre_chunk_results):
+                    break
                 max_chunk = np.argmax(chunk_results)
                 utts = texts[max_chunk]
+                pre_chunk_results = chunk_results
+                pre_max_chunk = max_chunk
 
-            results.append((utts[0], max(chunk_results)))
+            
+            most_relative_src = ". ".join(utts)
+            results.append((most_relative_src, max(pre_chunk_results)))
 
     return results
