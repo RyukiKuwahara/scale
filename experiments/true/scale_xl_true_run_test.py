@@ -32,7 +32,7 @@ results = {}
 for k in tqdm(data.keys()):
     # inf_summ = data[k]["generated_text"].to_numpy()[..., np.newaxis].tolist()[0]
     # convo = data[k]["grounding"].to_numpy()[..., np.newaxis].tolist()[0]
-    inf_summ = ["A and C is true"] #target
+    inf_summ = ["A, B, C, and D is true"] #target
     convo = ["A is true. B is true. C is true. D is true. E is true. F is true. G is true. H is true."] #source
     convo = [convo[0].split(". ")]
     # print("inf_summ: ", inf_summ)

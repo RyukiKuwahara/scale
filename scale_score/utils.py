@@ -366,7 +366,7 @@ def scale_retrieve(
             if texts is None:
                 raise ValueError("texts cannot be None")
             max_chunk = np.argmax(chunk_results)
-            print(utts, chunk_results)
+            # print(utts, chunk_results)
             utts = texts[max_chunk]
             # Optionally continue descending
             pre_chunk_results = chunk_results
@@ -384,7 +384,7 @@ def scale_retrieve(
                 if texts is None:
                     raise ValueError("texts cannot be None")
                 
-                print(utts, chunk_results)
+                # print(utts, chunk_results)
                 if max(chunk_results) < max(pre_chunk_results):
                     break
                 max_chunk = np.argmax(chunk_results)
