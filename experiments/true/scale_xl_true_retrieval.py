@@ -30,29 +30,30 @@ scorer = SCALEScorer(size=size, device="cuda")
 
 results = {}
 for k in tqdm(data.keys()):
+    print(k)
     inf_summ = data[k]["generated_text"].to_numpy()[..., np.newaxis].tolist()
     orig_convo = data[k]["grounding"].to_numpy()[..., np.newaxis].tolist()
     convo = [premiss[0] for premiss in orig_convo]
-    retrieval_convo = [premiss[0].split(". ") for premiss in orig_convo]
+    retrieval_convo = [premiss[0].split(" ") for premiss in orig_convo]
     label = data[k]["label"].tolist()
-    normal_res = scorer.score(convo[:3], inf_summ[:3])
-    retrieval_res = scorer.retrieve(retrieval_convo[:3], inf_summ[:3])
-    if len(normal_res) != len(retrieval_res):
-        raise ValueError(
-            "There must be an equal number of normal_res and retrieval_res"
-        )
+    # normal_res = scorer.score(convo, inf_summ)
+    retrieval_res = scorer.retrieve(retrieval_convo, inf_summ)
+    # if len(normal_res) != len(retrieval_res):
+    #     raise ValueError(
+    #         "There must be an equal number of normal_res and retrieval_res"
+    #     )
     
-    res = []
+    res = [retrieval_tuple[1] for retrieval_tuple in retrieval_res]
     mode = []
-    for normal_score, retrieval_tuple in zip(normal_res, retrieval_res):
-        retrieval_score = retrieval_tuple[1]
-        res.append(max(normal_score, retrieval_score))
-        if normal_score == retrieval_score:
-            mode.append("equal")
-        elif normal_score > retrieval_score:
-            mode.append("normal win!")
-        else:
-            mode.append("retrieval win!")
-    results[k] = [res, label, mode]
+    # for normal_score, retrieval_tuple in zip(normal_res, retrieval_res):
+    #     retrieval_score = retrieval_tuple[1]
+    #     res.append(max(normal_score, retrieval_score))
+    #     if normal_score == retrieval_score:
+    #         mode.append("equal")
+    #     elif normal_score > retrieval_score:
+    #         mode.append("normal")
+    #     else:
+    #         mode.append("retrieval")
+    results[k] = [res, label]
     with open(f"results/scale_{size}_true_retrieval_results.json", "w") as file:
         json.dump(results, file)

@@ -71,20 +71,35 @@ def get_retrieval_chunks(
                 prompt.replace("{{premise}}", convo[0]), return_tensors="pt"
             ).input_ids
         ], [convo]
+    
+    while (True):
+        interval = num_sents // branches
+        # print("interval", interval)
+        if interval == 0:
+            interval = 1
 
-    interval = num_sents // branches
-    if interval == 0:
-        interval = 1
+        cs = []
+        ranges = []
+        flag = True
+        for i in range(0, num_sents, interval):
+            ranges.append(convo[(i) : (interval + i)])
+            # print("ranges", ranges)
+            pmp = " ".join(convo[(i) : (interval + i)])
+            token_size = len(tokenizer(prompt.replace("{{premise}}", pmp), return_tensors="pt").input_ids[0])
+            # print("tokenizer", token_size)
+            if token_size > 512:
+                branches += 1
+                # print("continue, branch + 1", branches)
+                flag = False
+                break
+            cs.append(
+                tokenizer(prompt.replace("{{premise}}", pmp), return_tensors="pt").input_ids
+            )
+        # print(ranges)
+        if flag:
+            break
 
-    cs = []
-    ranges = []
-    for i in range(0, num_sents, interval):
-        ranges.append(convo[(i) : (interval + i)])
-        # print("ranges", ranges)
-        pmp = " ".join(convo[(i) : (interval + i)])
-        cs.append(
-            tokenizer(prompt.replace("{{premise}}", pmp), return_tensors="pt").input_ids
-        )
+    # print(len(ranges), branches)
 
     return cs, ranges
 
@@ -348,7 +363,7 @@ def scale_retrieve(
     yes_no_tokens = [tokenizer("Yes").input_ids[0], tokenizer("No").input_ids[0]]
     prompt = '{{premise}} Question: Does this imply that "{{hypothesis}}"? Yes or No?'
     results = []
-    for i in range(len(premise)):
+    for i in tqdm(range(len(premise))):
         # Precision calculation
         for idx, summ_sentence in enumerate(hypothesis[i]):
             prompt_part_filled = prompt.replace("{{hypothesis}}", summ_sentence)
@@ -393,7 +408,7 @@ def scale_retrieve(
                 pre_max_chunk = max_chunk
 
             
-            most_relative_src = ". ".join(utts)
+            most_relative_src = " ".join(utts)
             results.append((most_relative_src, max(pre_chunk_results)))
 
     return results
